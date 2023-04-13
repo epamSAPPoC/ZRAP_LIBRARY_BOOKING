@@ -1,0 +1,4 @@
+@EndUserText.label: 'Book'
+define service ZABC_UI_BOOK {
+  expose zabc_i_book;
+}

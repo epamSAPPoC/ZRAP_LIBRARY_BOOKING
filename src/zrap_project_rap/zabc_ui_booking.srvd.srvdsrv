@@ -1,0 +1,6 @@
+@EndUserText.label: 'Serv Definition for Bookings'
+define service ZABC_UI_BOOKING {
+  expose ZABC_C_BOOKING as Booking;
+  expose zabc_i_book as Book;
+  expose zabc_i_reader as Reader;
+}

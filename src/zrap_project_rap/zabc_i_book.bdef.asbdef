@@ -1,0 +1,25 @@
+managed implementation in class zbp_abc_i_book unique;
+//strict ( 2 );
+with draft;
+
+define behavior for zabc_i_book //alias <alias_name>
+persistent table zabc_d_book
+draft table zabc_d_book_d
+lock master
+total etag PagesNum
+authorization master ( instance )
+//etag master <field_name>
+{
+  create;
+  update;
+  delete;
+
+  mapping for zabc_d_book
+  {
+    AuthorId = author_id;
+    BookId = book_id;
+    BookName = book_name;
+    CopyQty = copy_qty;
+    PagesNum = pages_num;
+  }
+}

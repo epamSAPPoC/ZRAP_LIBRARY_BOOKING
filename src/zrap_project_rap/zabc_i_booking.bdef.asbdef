@@ -1,0 +1,84 @@
+/* == managed: the transactional buffer and the standard BO operations are handled by the RAP provisioning framework,
+            if we use unmanaged addiction then the transactional buffer and the standard BO operations must be implemented
+            in the ABAP behavior pool (class). */
+managed implementation in class zbp_abc_i_booking unique;
+
+/* == strict:  enables BDEF strict mode. When strict mode is switched on, outdated syntax which normally produces a syntax
+ check warning leads to a syntax check error. */
+strict;
+
+with draft;                           //*** should be added when enables the 'draft' functionality
+
+define behavior for ZABC_I_BOOKING alias Booking
+
+/* == persistent...: DDIC database table. The data on the persistent table is processed by RAP BO operations */
+persistent table zabc_d_booking_a
+
+draft table zabc_d_booking_d          //*** should be added when enables the 'draft' functionality
+
+/* == lock master: specifies the RAP locking mechanism for a RAP BO entity. The RAP locking mechanism prevents
+ simultaneous modification access to data on the database by more than one user */
+lock master
+total etag BookingBegTime             //*** should be added when enables the 'draft' functionality
+
+/* == authorization master ...: control in RAP protects your business object against unauthorized access to data.
+ Authorization control is defined in the entity behavior characteristics for each entity behavior definition separately
+ and must be implemented in the ABAP behavior pool. In the ABAP behavior pool, there are different methods for
+ implementation for global and for instance authorization. */
+authorization master ( instance )
+
+/* == etag ...: defines a field as entity tag (ETag) field for optimistic concurrency control */
+etag master BookingBegTime
+
+{
+  create;
+  update;
+  delete;
+
+  /* =={ should be added when enables the 'draft' functionality  */
+  draft action Edit;
+  draft action Activate;
+  draft action Discard;
+  draft action Resume;
+  draft determine action Prepare;
+  /* ==} should be added when enables the 'draft' functionality  */
+
+  /* == numbering ...: is used to set values for primary key automatically when creating record */
+  field ( numbering : managed, readonly ) BookingUuid;
+  //  field ( mandatory : create ) BookId, PersonId; // --- commented out due to avoid exception on action 'Create'
+  field ( readonly ) BookingStatus, BookingBegDate, BookingBegTime, BookingEndDate, BookingEndTime;
+
+  /* == validation ...: is automatically invoked by the RAP framework if the trigger condition of the validation is fulfilled.
+   Validations are always invoked during the save sequence at the end of a transaction and this is indicated by the
+   mandatory addition on save. There can be one or multiple trigger conditions. The trigger conditions can be changes of
+   field values or the execution of one of the standard operations create, update, or delete. When one of these operations
+   is executed for a draft instance or for an active instance, validations with the respective trigger operations are triggered.
+   Multiple trigger conditions can be combined. */
+  validation validateBookAvailability on save { create; }     //***
+
+  /* == determinations ...: Determine actions allow the business object consumer to call determinations and validations on request.
+   You can assign determinations on save and validations to a determined action and execute it like any other action.
+   Whenever a determined action is called, the determinations and validations assigned to it are evaluated and then only
+   those determinations and validations are executed whose trigger conditions are fulfilled */
+  determination bookTheBook on save { create; }               //***
+
+  /* == feature control ...: A functionality that provides property settings for fields, entities, actions, or associations of a given business object.
+   These settings control the behavior of a business object when it is in a certain state. On the user interface, these settings control,
+   for example, the following:
+   - Make fields mandatory, read only, editable, and/or invisible
+   - Enable/disable buttons The feature control is either static (valid for all instances of an entity) or dynamic (depends on the state of the node instances) */
+  action ( features : instance ) returnTheBook result [1] $self;
+
+  mapping for zabc_d_booking_a
+  {
+    BookingUuid = booking_uuid;
+    BookingId = booking_id;
+    BookId = book_id;
+    PersonId = person_id;
+    BookingStatus = booking_status;
+    BookingBegDate = booking_beg_date;
+    BookingBegTime = booking_beg_time;
+    BookingEndDate = booking_end_date;
+    BookingEndTime = booking_end_time;
+  }
+}

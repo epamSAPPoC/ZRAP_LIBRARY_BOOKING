@@ -1,0 +1,8 @@
+@EndUserText.label: 'OVP.Service Definition for Booking'
+define service zabc_ui_ovp_booking {
+  expose zabc_c_ovp_booking as OVPBooking;
+  expose zabc_i_ovp_booking_flt as FLTBooking;
+  expose zabc_i_reader as Reader;
+  expose zabc_i_book as Book;
+  expose zabc_i_author as Author;
+}

@@ -1,0 +1,129 @@
+@Metadata.layer: #CORE                        //  defines the priority of the metadata extension r(#CORE|#LOCALIZATION|#INDUSTRY|#PARTNER|#CUSTOMER).
+@UI.headerInfo: { typeName: 'Booking',
+                  typeNamePlural: 'Bookings',
+                  title.value: 'BookingId',            //
+                  description.value: '_Book.BookName'  //
+                }
+@UI.selectionVariant: [{
+    qualifier: 'BDSV',
+    text: 'Booking: Default'
+}]
+@UI.presentationVariant: [{
+    qualifier: 'BDPV',
+    text:'Bookint: Default'
+  }]
+@UI.selectionPresentationVariant: [{
+    id: 'BDSPV',
+    qualifier: 'BDSPV',
+    text:'Bookint: Default',
+    selectionVariantQualifier: 'BDSV',
+    presentationVariantQualifier: 'BDPV'
+ }]
+annotate view ZABC_C_BOOKING with
+{
+
+  @UI.facet: [
+               {
+                   id:              'GeneralInformation',
+                   type:            #COLLECTION,
+                   label:           'General Information',
+                   position:        10
+                }
+                ,
+               {
+                   id:              'AdminDataCollection',
+                   type:            #COLLECTION,
+                   label:           'Admin Data',
+                   position:        20
+                },
+               {
+                   id:              'BasicData',
+                   purpose:         #STANDARD ,
+                   parentId:        'GeneralInformation',
+                   type:            #FIELDGROUP_REFERENCE,
+                   label:           'Basic Data',
+                   position:        10,
+                   targetQualifier: 'BasicData'
+                },
+               {
+                   id:              'ReaderData',
+                   purpose:         #STANDARD ,
+                   parentId:        'GeneralInformation',
+                   type:            #FIELDGROUP_REFERENCE,
+                   label:           'Reader',
+                   position:        20,
+                   targetQualifier: 'Reader'
+                } ,
+                {
+                   id:              'BookData',
+                   purpose:         #STANDARD ,
+                   parentId:        'GeneralInformation',
+                   type:            #FIELDGROUP_REFERENCE,
+                   label:           'Book',
+                   position:        30,
+                   targetQualifier: 'Book'
+                },
+               {
+                   id:              'BookingTime',
+                   purpose:         #STANDARD ,
+                   parentId:        'GeneralInformation',
+                   type:            #FIELDGROUP_REFERENCE,
+                   label:           'Booking Time',
+                   position:        40,
+                   targetQualifier: 'BookingTime'
+                }]
+
+  @UI.identification: [{ type: #FOR_ACTION, dataAction: 'returnTheBook', label: 'Return the Book' }]
+  
+  @UI.hidden: true
+  BookingUuid;
+
+  @UI.lineItem:       [{ position: 10, importance: #HIGH }]
+  @UI.fieldGroup:     [{ position: 10, qualifier: 'BasicData' }]
+  BookingId;
+
+  @UI.selectionField: [{ position: 20 }]
+  @UI.lineItem:       [{ position: 20, importance: #HIGH }]
+  @UI.fieldGroup:     [{ position: 20, qualifier: 'BasicData' }]
+  BookingStatus;
+
+  @UI.selectionField: [{ position: 30 }]
+  @UI.lineItem:       [{ position: 30, importance: #HIGH }]
+  @UI.fieldGroup:     [{ position: 30, qualifier: 'Reader' }]
+  PersonId;
+  
+//  @UI.lineItem:       [{ position: 32, importance: #HIGH }]
+//  @UI.fieldGroup:     [{ position: 32, qualifier: 'Reader' }]
+//  ReaderFullName;
+  
+  @UI.selectionField: [{ position: 40 }]
+  @UI.lineItem:       [{ position: 40, importance: #HIGH }]
+  @UI.fieldGroup:     [{ position: 40, qualifier: 'Book' }]
+  BookId;
+
+//  @UI.lineItem:       [{ position: 42, importance: #HIGH }]
+//  @UI.fieldGroup:     [{ position: 42, qualifier: 'Book' }]
+//  BookName;
+  
+  @UI.selectionField: [{ position: 50 }]
+  @UI.lineItem:       [{ position: 50, importance: #HIGH }]
+  @UI.fieldGroup:     [{ position: 50, qualifier: 'BookingTime' }]
+  @UI.dataPoint: { title: 'Start Date' }
+  BookingBegDate;
+
+  @UI.selectionField: [{ position: 60 }]
+  @UI.lineItem:       [{ position: 60, importance: #MEDIUM }]
+  @UI.fieldGroup:     [{ position: 60, qualifier: 'BookingTime' }]
+  BookingBegTime;
+
+  @UI.selectionField: [{ position: 70 }]
+  @UI.lineItem:       [{ position: 70, importance: #HIGH }]
+  @UI.fieldGroup:     [{ position: 70, qualifier: 'BookingTime' }]
+  @UI.dataPoint: { title: 'End Date' }
+  BookingEndDate;
+
+  @UI.selectionField: [{ position: 80 }]
+  @UI.lineItem:       [{ position: 80, importance: #MEDIUM }]
+  @UI.fieldGroup:     [{ position: 80, qualifier: 'BookingTime' }]
+  BookingEndTime;
+}

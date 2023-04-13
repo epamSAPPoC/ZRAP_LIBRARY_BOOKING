@@ -1,0 +1,20 @@
+projection;
+strict;
+use draft;                  //*** should be added when enables the 'draft' functionality
+
+define behavior for ZABC_C_BOOKING alias Booking
+{
+  use create;
+  use update;
+  use delete;
+
+  use action returnTheBook;
+
+  /* =={ should be added when enables the 'draft' functionality  */
+  use action Edit;
+  use action Activate;
+  use action Discard;
+  use action Resume;
+  use action Prepare;
+  /* ==} should be added when enables the 'draft' functionality  */
+}

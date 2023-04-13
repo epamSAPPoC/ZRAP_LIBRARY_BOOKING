@@ -1,0 +1,220 @@
+@Metadata.layer: #CORE                        //  defines the priority of the metadata extension r(#CORE|#LOCALIZATION|#INDUSTRY|#PARTNER|#CUSTOMER).
+@UI.headerInfo: {                                        // define Entity Header characteristics: title, short description, the name of its entity in singular and plural form, image URLs
+                 typeName:          'Booking',           // - title on detail Page
+                 typeNamePlural:    'Bookings',          // - Id on group maintenance page
+                 title: { type:     #STANDARD,
+                          label:    'Booking ID:',
+                          value:    'BookingId' },
+                 description.value: '_Book.BookName'
+               }
+/* <<<< example: https://sapui5.hana.ondemand.com/sdk/#/topic/0d390fed360c4c58a0f0619338938de1
+ frontend UI: ..webapp/manifest.json to be updated
+
+  .... quickVariantSelection | quickVariantSelectionX
+            "variants": {
+              "<nnn>": {
+                "key": "_tab<nnn>",
+                "annotationPath": "com.sap.vocabularies.UI.v1.SelectionVariant#[qualifier]"
+           OR   "annotationPath": "com.sap.vocabularies.UI.v1.PresentationVariant#[qualifier]"
+           OR   "annotationPath": "com.sap.vocabularies.UI.v1.SelectionPresentationVariant#[qualifier]"
+              }
+*/
+@UI.selectionVariant: [
+  { qualifier:   'SV_ALL',
+    text:        'All Booking',
+    filter:      'BookingDuration CP "*"'
+    },
+  { qualifier:   'SV_InProgress',
+    text:        'Booking: Active',
+    filter:      'BookingStatus EQ "2"' // Active Booking
+    },
+  { qualifier:   'SV_Completed',
+    text:        'Booking: Completed',
+    filter:      'BookingStatus EQ "1"' // Booking Completed
+    }
+  ]
+@UI.presentationVariant: [
+  { qualifier:      'PV_Reader',
+    text:           'Booking by Reader',
+    sortOrder:      [{ by: 'ReaderFullName', direction: #ASC  },
+                     { by: 'BookingBegDate', direction: #DESC }],
+    groupBy:        [ 'ReaderFullName' ],
+    visualizations: [{ type: #AS_LINEITEM }],
+    requestAtLeast: [ 'ReaderFullName', 'BookingBegDate' ]
+    },
+  { qualifier:      'PV_BookName',
+    text:           'Booking by Books',
+    sortOrder:      [{ by: 'BookName',       direction: #ASC  },
+                     { by: 'BookingBegDate', direction: #DESC }],
+    groupBy:        [ 'BookName' ],
+    visualizations: [{ type: #AS_LINEITEM }],
+    requestAtLeast: [ 'BookName', 'BookingBegDate' ]
+    },
+  { qualifier:      'PV_Authors',
+    text:           'Booking by Authors',
+    sortOrder:      [{ by: 'AuthorFullName', direction: #ASC  },
+                     { by: 'AuthorFullName', direction: #DESC }],
+    groupBy:        [ 'AuthorFullName' ],
+    visualizations: [{ type: #AS_LINEITEM }],
+    requestAtLeast: [ 'AuthorFullName', 'BookingBegDate' ]
+    }
+  ]
+@UI.selectionPresentationVariant: [
+  { id:                           'SPV_DFT',
+    qualifier:                    'SPV_Default',
+    text:                         'Booking: Default',
+    selectionVariantQualifier:    'SV_ALL',
+    presentationVariantQualifier: 'PV_Reader'
+    }
+  ]
+/* >>>> example: https://sapui5.hana.ondemand.com/sdk/#/topic/0d390fed360c4c58a0f0619338938de1
+*/
+annotate view ZABC_C_LRV_BOOKING with
+{
+  @UI.facet: [                                     //  @UI.facet defines facets for the object page
+              {
+                  id:              'GeneralInformation',
+                  type:            #COLLECTION,
+                  label:           'General Information',
+                  position:        10
+               },
+              {
+                  id:              'AdminDataCollection',
+                  type:            #COLLECTION,
+                  label:           'Admin Data',
+                  position:        20
+              },
+              {
+                  id:              'BasicData',
+                  purpose:         #STANDARD ,
+                  parentId:        'GeneralInformation',
+                  type:            #FIELDGROUP_REFERENCE,
+                  label:           'Basic Data',
+                  position:        10,
+                  targetQualifier: 'BasicData'
+               },
+              {
+                  id:              'ReaderData',
+                  purpose:         #STANDARD ,
+                  parentId:        'GeneralInformation',
+                  type:            #FIELDGROUP_REFERENCE,
+                  label:           'Reader',
+                  position:        20,
+                  targetQualifier: 'Reader'
+               },
+              {
+                  id:              'BookData',
+                  purpose:         #STANDARD ,
+                  parentId:        'GeneralInformation',
+                  type:            #FIELDGROUP_REFERENCE,
+                  label:           'Book',
+                  position:        30,
+                  targetQualifier: 'Book'
+               },
+              {
+                  id:              'BookingDetails',
+                  purpose:         #STANDARD ,
+                  parentId:        'GeneralInformation',
+                  type:            #FIELDGROUP_REFERENCE,
+                  label:           'Booking Details',
+                  position:        40,
+                  targetQualifier: 'BookingDetails'
+              },
+              {
+                  id:              'BookingTime',
+                  purpose:         #STANDARD ,
+                  parentId:        'GeneralInformation',
+                  type:            #FIELDGROUP_REFERENCE,
+                  label:           'Booking Time',
+                  position:        50,
+                  targetQualifier: 'BookingTime'
+              }
+             ]
+
+  @UI.hidden: true
+  BookingUuid;
+
+  @UI.lineItem:       [{ position: 10, importance: #HIGH }]      // @UI.lineItem: provides a collection of data fields that is used in a table or a list
+  @UI.fieldGroup:     [{ position: 10,                           // @UI.fieldGroup: provides a collection of data fields with a label for the group.
+                                                                 //  UI.fieldGroup provides a single data instance in a form
+                         qualifier: 'BasicData' }]               //  qualifier: define field for fieldGroup.
+  BookingId;
+
+  @Consumption.valueHelpDefinition: [{ entity: { name:    'zabc_i_reader',  // @Consumption.valueHelpDefinition: connect to entity that has Values for Help.
+                                                 element: 'PersonId'} }]
+  //  @Consumption.semanticObject: 'zabc_i_reder'
+  @Consumption: { semanticObject: 'ReaderDetails',                          // Quick View: alias name of 'expose' in Service Definition 
+                  semanticObjectMapping.additionalBinding: [{ localElement: 'PersonId',
+                                                              element:      'PersonId' }]
+  }
+  @UI.selectionField: [{ position: 20 }]
+  @UI.lineItem:       [{ position: 20, importance: #HIGH }]
+  @UI.fieldGroup:     [{ position: 20, qualifier: 'Reader' }]
+  PersonId;
+
+  @Consumption.valueHelpDefinition: [{ entity: { name:    'zabc_i_book',
+                                                 element: 'BookId'} }]
+  //  @Consumption.semanticObject: 'zabc_i_book'
+  @Consumption: { semanticObject: 'BookDetails',                            // Quick View: alias name of 'expose' in Service Definition 
+                  semanticObjectMapping.additionalBinding: [{ localElement: 'BookId',
+                                                              element:      'BookId' }]
+  }
+  @UI.selectionField: [{ position: 30 }]                                    // @UI.selectionField: the field is used in an initial page as filter bar
+  @UI.lineItem:       [{ position: 30, importance: #HIGH }]
+  @UI.fieldGroup:     [{ position: 30, qualifier: 'Book' }]
+  BookId;
+
+  @Consumption: { semanticObject: 'AuthorDetails',                          // Quick View: alias name of 'expose' in Service Definition 
+                  semanticObjectMapping.additionalBinding: [{ localElement: 'AuthorId',
+                                                              element:      'AuthorId' }]
+  }
+  @UI.lineItem:       [{ position: 32, importance: #HIGH }]
+  @UI.fieldGroup:     [{ position: 32, qualifier: 'Book' }]
+  AuthorId;
+
+  @Consumption.valueHelpDefinition: [{ entity: { name:    'zabc_i_author',
+                                                 element: 'AuthorFullName'} }]
+  @UI.selectionField: [{ position: 34 }]                                    // @UI.selectionField: the field is used in an initial page as filter bar
+  //  @UI.lineItem:       [{ position: 34, importance: #HIGH }]
+  //  @UI.fieldGroup:     [{ position: 34, qualifier: 'Book' }]
+  AuthorFullName;
+
+  @UI.selectionField: [{ position: 40 }]
+  @UI.lineItem:       [{ position: 40, importance: #HIGH }]
+  @UI.fieldGroup:     [{ position: 40, qualifier: 'BasicData' }]
+  BookingStatus;
+
+  @UI.lineItem:       [{ position: 45, importance: #HIGH }]
+  @UI.fieldGroup:     [{ position: 45, qualifier: 'BookingDetails' }]
+  BookingDuration;
+
+  @Consumption.filter: { selectionType: #INTERVAL ,         // @Consumption.filter: enables filtering elements of the underlying view. A filter should be specified before executing a query on the view
+                         multipleSelections:  false }
+  @UI.selectionField: [{ position: 50 }]
+  @UI.lineItem:       [{ position: 50, importance: #HIGH }]
+  @UI.fieldGroup:     [{ position: 50, qualifier: 'BookingTime' }]
+  @UI.dataPoint:       { title: 'Start Date' }
+  BookingBegDate;
+
+  @Consumption.filter: { selectionType: #INTERVAL , multipleSelections:  false }
+  @UI.selectionField: [{ position: 60 }]
+  @UI.lineItem:       [{ position: 60, importance: #MEDIUM }]
+  @UI.fieldGroup:     [{ position: 60, qualifier: 'BookingTime' }]
+  BookingBegTime;
+
+  @Consumption.filter: { selectionType: #INTERVAL , multipleSelections:  false }
+  @UI.selectionField: [{ position: 70 }]
+  @UI.lineItem:       [{ position: 70, importance: #HIGH }]
+  @UI.fieldGroup:     [{ position: 70, qualifier: 'BookingTime' }]
+  @UI.dataPoint:       { title: 'End Date' }
+  BookingEndDate;
+
+  @Consumption.filter: { selectionType: #INTERVAL , multipleSelections:  false }
+  @UI.selectionField: [{ position: 80 }]
+  @UI.lineItem:       [{ position: 80, importance: #MEDIUM }]
+  @UI.fieldGroup:     [{ position: 80, qualifier: 'BookingTime' }]
+  BookingEndTime;
+
+  @UI.lineItem:       [{ position: 90, importance: #MEDIUM }]
+  BookingQuantity;
+}

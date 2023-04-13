@@ -1,0 +1,4 @@
+@EndUserText.label: 'Service Definition for Books'
+define service ZABC_UI_ALP_BOOK {
+  expose ZABC_C_ALP_BOOK as ALPBook;
+}

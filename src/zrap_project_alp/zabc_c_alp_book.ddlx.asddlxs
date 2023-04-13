@@ -1,0 +1,97 @@
+@Metadata.layer: #CORE
+@UI.headerInfo: { typeName: 'Book',
+                  typeNamePlural: 'Books',
+                  imageUrl: 'ImageUrl',
+                  title.value: 'BookName',
+                  description.value: 'AuthorName'
+                }
+@UI.selectionPresentationVariant:[
+    {                                 //chart and table
+        qualifier: 'Default',
+        presentationVariantQualifier: 'Default',
+        selectionVariantQualifier: 'Default'
+    }]
+
+@UI.presentationVariant:[
+    {                                 //main area chart
+        qualifier: 'Default',
+        visualizations: [{
+            type: #AS_CHART,
+            qualifier: 'ChartDefault'
+        }]
+    },
+     {                                //visual filter
+        qualifier: 'pvAVGGPageNumByAuthor',
+        text: 'Number of Pages by Author',
+        sortOrder: [{ by: 'PagesNum', direction: #DESC }] ,
+        visualizations: [{
+            type: #AS_CHART,
+            qualifier: 'ChartAvgPageNumbyBook'
+        }]
+    }
+    ]
+@UI.selectionVariant:[
+    {                                 //main area
+        qualifier: 'Default',
+        text: 'Default'
+
+    }]
+@UI.chart: [
+    {
+            qualifier: 'ChartDefault',
+            chartType: #BAR,
+            dimensions:  [ 'AuthorId' ],
+            measures:  [ 'CopyQty' ],
+            dimensionAttributes: [{ dimension: 'AuthorId', role: #SERIES }],
+            measureAttributes:   [{ measure:   'CopyQty', role: #AXIS_1  }]
+    },
+    {                               //visual filter
+        qualifier: 'ChartAvgPageNumbyBook',
+        chartType: #DONUT,
+        dimensions:  [ 'AuthorId' ],
+        measures:    [ 'PagesNum' ],
+        dimensionAttributes: [{ dimension: 'AuthorId', role: #CATEGORY }],
+        measureAttributes:   [{ measure: 'PagesNum', role: #AXIS_1   }]
+    }
+]
+annotate view ZABC_C_ALP_BOOK with
+{
+  @UI.facet: [{
+                  id:              'GeneralInformation',
+                  type:            #COLLECTION,
+                  label:           'General Information',
+                  position:        10
+               },
+              {
+                  id:              'BasicData',
+                  purpose:         #STANDARD ,
+                  parentId:        'GeneralInformation',
+                  type:            #FIELDGROUP_REFERENCE,
+                  label:           'Basic Data',
+                  position:        10,
+                  targetQualifier: 'BasicData'
+               }]
+
+  @UI.lineItem:       [{ position: 10, importance: #HIGH }]
+  @UI.fieldGroup:     [{ position: 10, qualifier: 'BasicData' }]
+  BookId;
+
+  @UI.lineItem:       [{ position: 20, importance: #HIGH }]
+  @UI.fieldGroup:     [{ position: 20, qualifier: 'BasicData' }]
+  BookName;
+
+  @UI.selectionField: [{ position: 30 }]
+  @UI.lineItem:       [{ position: 30, importance: #HIGH }]
+  @UI.fieldGroup:     [{ position: 30, qualifier: 'BasicData' }]
+  AuthorId;
+
+  @UI.lineItem:       [{ position: 40, importance: #MEDIUM }]
+  @UI.fieldGroup:     [{ position: 40, qualifier: 'BasicData' }]
+  @UI.dataPoint:       { title: 'Number of Pages'}
+  PagesNum;
+
+  @UI.lineItem:       [{ position: 50, importance: #MEDIUM }]
+  @UI.fieldGroup:     [{ position: 50, qualifier: 'BasicData' }]
+  @UI.dataPoint:       { title: 'Number of Copies' }
+  CopyQty;
+}
